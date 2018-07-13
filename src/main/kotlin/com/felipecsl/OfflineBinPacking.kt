@@ -2,7 +2,9 @@ package com.felipecsl
 
 import java.util.*
 
-class BinPacking {
+/** Collection of bin packing algorithms where the full list of items is known beforehand */
+class OfflineBinPacking {
+  /** https://www.sciencedirect.com/science/article/pii/0885064X85900226?via%3Dihub */
   fun firstFitDecreasing(
       items: List<WeightedItem>,
       totalBins: Int

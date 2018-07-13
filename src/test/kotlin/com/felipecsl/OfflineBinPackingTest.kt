@@ -3,9 +3,9 @@ package com.felipecsl
 import com.github.javafaker.Faker
 import org.junit.Test
 
-class BinPackingTest {
+class OfflineBinPackingTest {
   @Test fun `manual test`() {
-    val balancer = BinPacking()
+    val balancer = OfflineBinPacking()
     val faker = Faker()
     val maxTasks = 100
     val maxWeight = 1000
@@ -40,4 +40,4 @@ class BinPackingTest {
       println("Total weight=$totalWeight, total items=$totalTasks, weight/item=$weightPerTask")
     }
   }
-}`
+}
