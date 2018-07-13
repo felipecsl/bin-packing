@@ -10,7 +10,7 @@ out/
 
 # User-specific stuff:
 .idea/**/workspace.xml
-.idea/**/tasks.xml
+.idea/**/items.xml
 .idea/dictionaries
 
 # Sensitive or high-churn files:

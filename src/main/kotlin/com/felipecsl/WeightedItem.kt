@@ -1,6 +1,6 @@
 package com.felipecsl
 
-data class WeightedTask(
+data class WeightedItem(
     val name: String,
     val weight: Int
 )
