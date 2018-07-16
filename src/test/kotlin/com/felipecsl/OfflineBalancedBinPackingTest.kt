@@ -3,8 +3,8 @@ package com.felipecsl
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-class OfflineBinPackingTest {
-  private val binPacking = OfflineBinPacking()
+class OfflineBalancedBinPackingTest {
+  private val binPacking = OfflineBalancedBinPacking()
   private val items = listOf(
       Item(522), Item(765), Item(288), Item(131),
       Item(983), Item(23), Item(987), Item(361),
@@ -34,28 +34,27 @@ class OfflineBinPackingTest {
   )
 
   @Test fun `test firstFitDecreasing`() {
-    val result = binPacking.firstFitDecreasing(items, 10)
-    val lightestBin = result.map { it.sumBy(Item::weight) }.min()
-    val heaviestBin = result.map { it.sumBy(Item::weight) }.max()
-    val weights = result.map { it.sumBy(Item::weight) }.sortedDescending()
-    val counts = result.map { it.size }.sortedDescending()
-    assertThat(weights).isEqualTo(
-        listOf(6377, 6244, 6175, 5908, 5767, 5611, 5495, 5123, 4563, 3779))
-    assertThat(counts).isEqualTo(listOf(23, 15, 12, 11, 9, 8, 7, 6, 5, 4))
-    assertThat(lightestBin).isEqualTo(3779)
-    assertThat(heaviestBin).isEqualTo(6377)
+    val result = binPacking.firstFitDecreasing(items, 7000, 10)
+    val lightestBin = result.map(Bin::weight).min()
+    val heaviestBin = result.map(Bin::weight).max()
+    val weights = result.map(Bin::weight).sortedDescending()
+    val counts = result.map(Bin::size).sortedDescending()
+    assertThat(weights).isEqualTo(listOf(6984, 6971, 6942, 6917, 6915, 6904, 6732, 6677))
+    assertThat(counts).isEqualTo(listOf(23, 15, 14, 11, 10, 9, 9, 9))
+    assertThat(lightestBin).isEqualTo(6677)
+    assertThat(heaviestBin).isEqualTo(6984)
   }
 
   @Test fun `manual test`() {
-    run("first fit 100", binPacking::firstFitDecreasing, 100)
-    run("best fit 100", binPacking::bestFitDecreasing, 100)
+    run("first fit 100", binPacking::firstFitDecreasing)
+//    run("best fit 100", binPacking::bestFitDecreasing, 10, 100)
   }
 
   @Test fun `test bestFitDecreasing`() {
-    val result = binPacking.bestFitDecreasing(items, 10)
-    val lightestBin = result.map { it.sumBy(Item::weight) }.min()
-    val heaviestBin = result.map { it.sumBy(Item::weight) }.max()
-    val weights = result.map { it.sumBy(Item::weight) }.sortedDescending()
+    val result = binPacking.bestFitDecreasing(items, 7000, 10)
+    val lightestBin = result.map { it.weight }.min()
+    val heaviestBin = result.map { it.weight }.max()
+    val weights = result.map { it.weight }.sortedDescending()
     val counts = result.map { it.size }.sortedDescending()
     assertThat(weights).isEqualTo(
         listOf(6282, 6270, 5718, 5546, 5442, 5367, 5335, 5190, 4995, 4897))
@@ -66,14 +65,15 @@ class OfflineBinPackingTest {
 
   private fun run(
       label: String,
-      func: (List<Item>, Int) -> List<List<Item>>,
-      maxBins: Int = 10
+      func: (List<Item>, Int, Int) -> List<Bin>,
+      maxBinSize: Int = Int.MAX_VALUE,
+      maxBins: Int = Int.MAX_VALUE
   ) {
     println("------------------\n$label")
-    val result = func(items, maxBins)
+    val result = func(items, maxBinSize, maxBins)
     printGroups(result)
-    val min = result.map { it.sumBy(Item::weight) }.min()!!
-    val max = result.map { it.sumBy(Item::weight) }.max()!!
+    val min = result.map { it.weight }.min()!!
+    val max = result.map { it.weight }.max()!!
     println("Lightest bin=$min, Heaviest bin=$max")
   }
 
