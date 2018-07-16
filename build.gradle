@@ -13,7 +13,6 @@ dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
   implementation "com.google.guava:guava:23.6.1-jre"
   testImplementation 'com.google.truth:truth:0.41'
-  testImplementation "com.github.javafaker:javafaker:0.15"
 }
 
 compileKotlin {

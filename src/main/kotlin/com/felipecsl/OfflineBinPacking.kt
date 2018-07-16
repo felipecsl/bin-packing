@@ -6,19 +6,22 @@ import java.util.*
 class OfflineBinPacking {
   /** https://www.sciencedirect.com/science/article/pii/0885064X85900226?via%3Dihub */
   fun firstFitDecreasing(
-      items: List<WeightedItem>,
-      totalBins: Int
-  ): List<List<WeightedItem>> {
-    if (totalBins <= 0) return listOf()
-    val itemGroups = (0 until totalBins)
-        .map { mutableListOf<WeightedItem>() }
-        .toMutableList()
-    val sortedItems: Queue<WeightedItem> =
-        ArrayDeque(items.sortedByDescending(WeightedItem::weight))
+      items: List<Item>,
+      maxBins: Int = Int.MAX_VALUE
+  ): List<List<Item>> {
+    if (maxBins <= 0) return listOf()
+    val bins = mutableListOf<MutableList<Item>>()
+    val sortedItems: Queue<Item> = ArrayDeque(items.sortedByDescending(Item::weight))
     var maxWeightSoFar = 0
     var i = 0
     while (sortedItems.isNotEmpty()) {
-      val currentProcessor = itemGroups[i++ % itemGroups.size]
+      val nextIndex = i++ % maxBins
+      val currentProcessor = if (nextIndex < bins.size) {
+        bins[nextIndex]
+      } else {
+        bins.add(mutableListOf())
+        bins[nextIndex]
+      }
       var currentProcessorWeight = currentProcessor.totalWeight()
       while (currentProcessor.isEmpty()
           || (currentProcessorWeight < maxWeightSoFar && sortedItems.isNotEmpty())) {
@@ -28,37 +31,36 @@ class OfflineBinPacking {
       }
       maxWeightSoFar = Math.max(maxWeightSoFar, currentProcessorWeight)
     }
-    return itemGroups
+    return bins.filter { it.isNotEmpty() }
   }
 
   fun bestFitDecreasing(
-      items: List<WeightedItem>,
-      totalBins: Int
-  ): List<List<WeightedItem>> {
-    if (totalBins <= 0) return listOf()
-    val sortedTasks = ArrayDeque(items.sortedByDescending(WeightedItem::weight))
-    val itemGroups = (0 until totalBins)
-        .map { mutableListOf<WeightedItem>() }
-        .toMutableList()
+      items: List<Item>,
+      maxBins: Int = Int.MAX_VALUE
+  ): List<List<Item>> {
+    if (maxBins <= 0) return listOf()
+    val sortedItems = ArrayDeque(items.sortedByDescending(Item::weight))
+    val bins = mutableListOf<MutableList<Item>>()
     var maxWeightSoFar = 0
-    while (sortedTasks.isNotEmpty()) {
-      val currentProcessor = itemGroups.minBy { it.totalWeight() }!!
+    while (sortedItems.isNotEmpty()) {
+      if (bins.size < maxBins) bins.add(mutableListOf())
+      val currentProcessor = bins.minBy { it.totalWeight() }!!
       var currentProcessorWeight = currentProcessor.totalWeight()
-      while (sortedTasks.isNotEmpty() &&
+      while (sortedItems.isNotEmpty() &&
           (currentProcessor.isEmpty() || currentProcessorWeight < maxWeightSoFar)) {
         val nextTask = if (maxWeightSoFar > 0
-            && (currentProcessorWeight + sortedTasks.peek().weight > maxWeightSoFar)) {
-          sortedTasks.removeLast()
+            && (currentProcessorWeight + sortedItems.peek().weight > maxWeightSoFar)) {
+          sortedItems.removeLast()
         } else {
-          sortedTasks.removeFirst()
+          sortedItems.removeFirst()
         }
         currentProcessorWeight += nextTask.weight
         currentProcessor.add(nextTask)
       }
       maxWeightSoFar = Math.max(maxWeightSoFar, currentProcessorWeight)
     }
-    return itemGroups
+    return bins.filter { it.isNotEmpty() }
   }
 
-  private fun List<WeightedItem>.totalWeight() = sumBy(WeightedItem::weight)
+  private fun List<Item>.totalWeight() = sumBy(Item::weight)
 }
