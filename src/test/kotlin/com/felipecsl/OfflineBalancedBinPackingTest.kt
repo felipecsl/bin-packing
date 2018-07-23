@@ -6,31 +6,31 @@ import org.junit.Test
 class OfflineBalancedBinPackingTest {
   private val binPacking = OfflineBalancedBinPacking()
   private val items = listOf(
-      Item(522), Item(765), Item(288), Item(131),
-      Item(983), Item(23), Item(987), Item(361),
-      Item(127), Item(296), Item(523), Item(363),
-      Item(899), Item(977), Item(720), Item(896),
-      Item(838), Item(86), Item(736), Item(496),
-      Item(854), Item(355), Item(311), Item(492),
-      Item(92), Item(535), Item(842), Item(574),
-      Item(949), Item(493), Item(938), Item(942),
-      Item(964), Item(932), Item(950), Item(119),
-      Item(599), Item(604), Item(838), Item(767),
-      Item(669), Item(687), Item(681), Item(462),
-      Item(486), Item(605), Item(61), Item(214),
-      Item(643), Item(922), Item(537), Item(692),
-      Item(707), Item(140), Item(437), Item(489),
-      Item(998), Item(122), Item(222), Item(529),
-      Item(68), Item(613), Item(774), Item(642),
-      Item(443), Item(831), Item(28), Item(639),
-      Item(701), Item(349), Item(534), Item(762),
-      Item(965), Item(614), Item(677), Item(187),
-      Item(460), Item(223), Item(493), Item(401),
-      Item(858), Item(757), Item(240), Item(656),
-      Item(775), Item(359), Item(141), Item(360),
-      Item(893), Item(421), Item(15), Item(230),
-      Item(914), Item(741), Item(821), Item(289),
-      Item(713), Item(236), Item(495), Item(254)
+      item(522), item(765), item(288), item(131),
+      item(983), item(23), item(987), item(361),
+      item(127), item(296), item(523), item(363),
+      item(899), item(977), item(720), item(896),
+      item(838), item(86), item(736), item(496),
+      item(854), item(355), item(311), item(492),
+      item(92), item(535), item(842), item(574),
+      item(949), item(493), item(938), item(942),
+      item(964), item(932), item(950), item(119),
+      item(599), item(604), item(838), item(767),
+      item(669), item(687), item(681), item(462),
+      item(486), item(605), item(61), item(214),
+      item(643), item(922), item(537), item(692),
+      item(707), item(140), item(437), item(489),
+      item(998), item(122), item(222), item(529),
+      item(68), item(613), item(774), item(642),
+      item(443), item(831), item(28), item(639),
+      item(701), item(349), item(534), item(762),
+      item(965), item(614), item(677), item(187),
+      item(460), item(223), item(493), item(401),
+      item(858), item(757), item(240), item(656),
+      item(775), item(359), item(141), item(360),
+      item(893), item(421), item(15), item(230),
+      item(914), item(741), item(821), item(289),
+      item(713), item(236), item(495), item(254)
   )
 
   @Test fun `test firstFitDecreasing`() {
@@ -82,7 +82,14 @@ class OfflineBalancedBinPackingTest {
       val totalWeight = it.sumBy(Item::weight)
       val totalItems = it.size
       val weightPerTask = if (totalItems > 0) totalWeight / totalItems else 0
-      println("Bin=$i, total weight=$totalWeight, total items=$totalItems, weight/item=$weightPerTask")
+      println(
+          "Bin=$i, total weight=$totalWeight, total items=$totalItems, weight/item=$weightPerTask")
     }
+  }
+
+  private fun item(weight: Int) = object : Item {
+    override val weight: Int
+      get() = weight
+
   }
 }
