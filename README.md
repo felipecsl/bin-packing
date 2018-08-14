@@ -10,7 +10,7 @@ Provides an implementation for common bin packing algorithms in Kotlin:
 ## Download
 
 ```groovy
-compile 'com.felipecsl:bin-packing:1.0.0-SNAPSHOT'
+compile 'com.felipecsl:bin-packing:1.0.1-SNAPSHOT'
 ```
 
 MIT license
