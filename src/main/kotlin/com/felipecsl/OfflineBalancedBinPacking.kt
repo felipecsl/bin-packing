@@ -16,23 +16,34 @@ class OfflineBalancedBinPacking {
     if (items.sumBy(Item::weight) > (maxBins.toLong() * maxBinSize.toLong())) {
       throw IllegalArgumentException("Can't fit all items in the provided bins.")
     }
+    if (items.any { it.weight > maxBinSize }) {
+      throw IllegalArgumentException("All items' weights must be under `maxBinSize`.")
+    }
     if (maxBins <= 0) return listOf()
     val bins = mutableListOf<Bin>()
     val sortedItems = items.toQueueDesc()
     var maxWeightSoFar = 0
     var i = 0
+    val newBin = {
+      if (bins.size < maxBins) {
+        Bin(maxBinSize).also { bins.add(it) }
+      } else {
+        throw IllegalArgumentException("Not enough space found to store all items.")
+      }
+    }
     while (sortedItems.isNotEmpty()) {
       val nextItemWeight = sortedItems.peek().weight
-      val currentBin = findBinForItem(bins, i++ % maxBins, nextItemWeight)
-          ?: if (bins.size < maxBins && nextItemWeight < maxBinSize) {
-            Bin(maxBinSize).also { bins.add(it) }
-          } else {
-            throw IllegalArgumentException("Not enough space found to store all items.")
-          }
-      while (currentBin.isEmpty() || (
-              currentBin.weight < maxWeightSoFar
-                  && sortedItems.isNotEmpty()
-                  && currentBin.remainingWeight >= nextItemWeight)) {
+      val currentBin = findBinForItem(bins, i++ % maxBins, nextItemWeight, maxWeightSoFar, maxBins)
+          ?: newBin()
+      while (currentBin.isEmpty()
+          || (bins.all { it.weight == maxWeightSoFar }
+              && currentBin.remainingWeight >= nextItemWeight
+              && sortedItems.isNotEmpty()
+              && bins.size == maxBins)
+          || (currentBin.weight < maxWeightSoFar
+              && sortedItems.isNotEmpty()
+              && currentBin.remainingWeight >= nextItemWeight)
+      ) {
         currentBin.add(sortedItems.remove())
       }
       maxWeightSoFar = Math.max(maxWeightSoFar, currentBin.weight)
@@ -72,10 +83,20 @@ class OfflineBalancedBinPacking {
 
   private fun List<Item>.toQueueDesc() = ArrayDeque(sortedByDescending(Item::weight))
 
-  private fun findBinForItem(bins: List<Bin>, startIndex: Int, itemWeight: Int): Bin? {
-    // start searching at startIndex and wrap around
-    val search = bins.drop(startIndex + 1) + bins.take(startIndex)
-    return recurseFindBinForItem(search, itemWeight)
+  private fun findBinForItem(
+      bins: List<Bin>,
+      startIndex: Int,
+      itemWeight: Int,
+      maxWeightSoFar: Int,
+      maxBins: Int
+  ): Bin? {
+    return if (bins.all { it.weight == maxWeightSoFar } && bins.size < maxBins) {
+      null
+    } else {
+      // start searching at startIndex and wrap around
+      val search = bins.drop(startIndex + 1) + bins.take(startIndex)
+      recurseFindBinForItem(search, itemWeight)
+    }
   }
 
   private fun recurseFindBinForItem(bins: List<Bin>, itemWeight: Int): Bin? {

@@ -45,6 +45,18 @@ class OfflineBalancedBinPackingTest {
     assertThat(heaviestBin).isEqualTo(6984)
   }
 
+  @Test fun `make sure the computation finishes`() {
+    // all items fit perfectly in 3 bins of weight=7 each
+    val items = listOf(item(1), item(2), item(3), item(2), item(1), item(4), item(3), item(1),
+        item(2), item(2))
+    val result = binPacking.firstFitDecreasing(items, 10, 3)
+    assertThat(result.size).isEqualTo(3)
+    assertThat(result).containsExactly(
+        listOf(item(4), item(2), item(1)),
+        listOf(item(3), item(3), item(1)),
+        listOf(item(2), item(2), item(2), item(1)))
+  }
+
   @Test fun `manual test`() {
     run("first fit 100", binPacking::firstFitDecreasing)
 //    run("best fit 100", binPacking::bestFitDecreasing, 10, 100)
@@ -87,9 +99,10 @@ class OfflineBalancedBinPackingTest {
     }
   }
 
-  private fun item(weight: Int) = object : Item {
+  data class TestItem(val w: Int) : Item {
     override val weight: Int
-      get() = weight
-
+      get() = w
   }
+
+  private fun item(weight: Int) = TestItem(weight)
 }
